@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Työkoe</title>
+<style>
+:root{--ac:#0f766e;--ac2:#d5f0ec;--bg:#f7f7f8;--tx:#18181b;--mu:#52525b;--bd:#d4d4d8;--ok:#17693f;--okbg:#dff1e6;--va:#7d5200;--vabg:#fbeecd;--vi:#a02c25;--vibg:#fbe3e0}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{background:var(--ac);color:#fff;padding:14px 16px}
+header h1{margin:0;font-size:19px}
+header p{margin:2px 0 0;font-size:13px;opacity:.9}
+main{padding:14px 16px 40px;display:flex;flex-direction:column;gap:14px;max-width:560px;margin:0 auto}
+section{background:#fff;border:1px solid #e6e6e8;border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+h2{margin:0;font-size:16px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+p{margin:0}
+.pieni{font-size:13.5px;color:var(--mu)}
+.tila{display:inline-block;border-radius:99px;padding:2px 10px;font-size:12.5px;font-weight:700;background:#e8eeea;color:#3f4a44}
+.tila.ok{background:var(--okbg);color:var(--ok)}.tila.va{background:var(--vabg);color:var(--va)}.tila.vi{background:var(--vibg);color:var(--vi)}
+button,.nappi{font:inherit;font-weight:600;min-height:48px;padding:10px 16px;border-radius:9px;border:0;background:var(--ac);color:#fff;cursor:pointer;text-align:center}
+button.toinen,.nappi.toinen{background:#fff;color:var(--tx);border:1px solid var(--bd)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #0b5a54;outline-offset:2px}
+.rivi{display:flex;gap:8px;flex-wrap:wrap}
+.rivi>*{flex:1 1 140px}
+.sirut{display:flex;gap:6px;flex-wrap:wrap}
+.siru{flex:0 0 auto;min-height:44px;background:#fff;color:var(--tx);border:1px solid var(--bd);border-radius:99px;padding:8px 14px}
+.siru[aria-pressed="true"]{background:var(--ac);border-color:var(--ac);color:#fff}
+label{font-size:13px;font-weight:700;color:var(--mu);display:block}
+input[type=text],input[type=date],select{width:100%;font:inherit;min-height:46px;padding:9px 12px;border:1px solid var(--bd);border-radius:9px;background:#fff;color:var(--tx)}
+input[type=file]{width:100%;font:inherit}
+ul{margin:0;padding-left:18px}
+li{margin-bottom:3px}
+textarea{width:100%;min-height:150px;font:13px/1.4 ui-monospace,Menlo,Consolas,monospace;border:1px solid var(--bd);border-radius:9px;padding:10px}
+</style>
+</head>
+<body>
+<header><h1>Työkoe</h1><p>Kirjanpito-ohjelman puhelinkirjauksen koesivu 0.1. Mitään ei lähetetä verkkoon.</p></header>
+<main>
+
+<section aria-labelledby="o1">
+  <h2 id="o1">1. Toimiiko ilman verkkoa <span class="tila" id="t1">tarkistetaan</span></h2>
+  <p class="pieni" id="s1"></p>
+  <p class="pieni">Koe: kun tila on Valmis, laita puhelin lentotilaan ja avaa sivu uudelleen.</p>
+</section>
+
+<section aria-labelledby="o2">
+  <h2 id="o2">2. Säilyvätkö tiedot <span class="tila" id="t2">tarkistetaan</span></h2>
+  <p class="pieni" id="s2"></p>
+  <p class="pieni">Koe: tallenna työ kohdassa 5, sulje selain, käynnistä puhelin uudelleen ja avaa sivu. Työn pitää näkyä kohdassa 6.</p>
+</section>
+
+<section aria-labelledby="o3">
+  <h2 id="o3">3. Lohkot Vipun tiedostosta <span class="tila" id="t3">ei luettu</span></h2>
+  <label for="lohkotied">Valitse peruslohko.dbf ja peruslohko.shp (ja halutessasi kasvulohkon tiedostot)</label>
+  <input type="file" id="lohkotied" multiple>
+  <p class="pieni" id="s3">Lohkot jäävät vain tähän puhelimeen.</p>
+  <ul id="lohkolista" class="pieni"></ul>
+  <button type="button" class="toinen" id="lohkotpois" hidden>Poista lohkot puhelimesta</button>
+</section>
+
+<section aria-labelledby="o4">
+  <h2 id="o4">4. Sijainti <span class="tila" id="t4">ei haettu</span></h2>
+  <button type="button" id="haesij">Hae sijainti</button>
+  <p id="s4" class="pieni">Koe pellolla ja pellon reunalla. Tarkkuus kertoo, voiko lohkoa ehdottaa sijainnista.</p>
+</section>
+
+<section aria-labelledby="o5">
+  <h2 id="o5">5. Kirjaa työ</h2>
+  <div><label id="tyol">Työ</label><div class="sirut" id="tyot" role="group" aria-labelledby="tyol"></div></div>
+  <div><label for="lohko">Lohko</label><select id="lohko"></select></div>
+  <div class="rivi">
+    <div><label for="pvm">Päivä</label><input type="date" id="pvm"></div>
+    <div><label for="maara">Panos tai sato</label><input type="text" id="maara" placeholder="esim. 2 säkkiä tai 142 paalia"></div>
+  </div>
+  <div><label for="kuva">Kuva (valinnainen)</label><input type="file" id="kuva" accept="image/*" capture="environment"></div>
+  <button type="button" id="tallenna">Tallenna työ</button>
+  <p class="pieni" id="s5" role="status"></p>
+</section>
+
+<section aria-labelledby="o6">
+  <h2 id="o6">6. Lähetä tietokoneelle <span class="tila" id="t6">ei kokeiltu</span></h2>
+  <ul id="tyolista"></ul>
+  <button type="button" id="laheta">Lähetä työt tietokoneelle</button>
+  <p class="pieni">Koe: valitse jakovalikosta Tallenna tiedostoihin (iPhone) tai Drive (Android) ja pilvikansio. Tarkista tietokoneelta, että tiedosto ja kuva tulivat perille.</p>
+  <p class="pieni" id="s6" role="status"></p>
+  <button type="button" class="toinen" id="tyhjenna">Poista työt puhelimesta</button>
+</section>
+
+<section aria-labelledby="o7">
+  <h2 id="o7">7. Tulokset</h2>
+  <p class="pieni">Kopioi tämä ja liitä Claudelle, kun kokeet on tehty.</p>
+  <textarea id="tulos" readonly aria-label="Kokeiden tulokset"></textarea>
+  <button type="button" class="toinen" id="kopioi">Kopioi tulokset</button>
+</section>
+
+</main>
+<script>
+"use strict";
+/* ===== YDINFUNKTIOT (ei käyttöliittymää; testattu erikseen tietokoneella) ===== */
+
+/** Lukee .dbf-tiedoston riveiksi. Vipun tiedostossa kaikki kentät ovat tekstiä, merkistö ISO-8859-1. */
+function lueDbf(puskuri){
+  const v = new DataView(puskuri), n = v.getUint32(4, true), otsikko = v.getUint16(8, true), rivi = v.getUint16(10, true);
+  const dek = new TextDecoder("iso-8859-1"), tavut = new Uint8Array(puskuri), kentat = [];
+  for (let o = 32; tavut[o] !== 0x0D && o < otsikko; o += 32){
+    let nimi = ""; for (let i = 0; i < 11 && tavut[o + i]; i++) nimi += String.fromCharCode(tavut[o + i]);
+    kentat.push({ nimi, pituus: tavut[o + 16] });
+  }
+  const rivit = [];
+  for (let i = 0; i < n; i++){
+    let p = otsikko + i * rivi + 1; const r = {};
+    for (const k of kentat){ r[k.nimi] = dek.decode(tavut.subarray(p, p + k.pituus)).trim(); p += k.pituus; }
+    rivit.push(r);
+  }
+  return rivit;
+}
+
+/** Lukee .shp-tiedoston monikulmiot: jokaisesta muodosta lista renkaita, rengas = [[E, N], ...] (ETRS-TM35FIN, metriä). */
+function lueShp(puskuri){
+  const v = new DataView(puskuri), muodot = []; let o = 100;
+  while (o + 8 <= v.byteLength){
+    const pituus = v.getUint32(o + 4, false) * 2; o += 8;
+    const tyyppi = v.getInt32(o, true), renkaat = [];
+    if (tyyppi === 5 || tyyppi === 15 || tyyppi === 25){
+      const osia = v.getInt32(o + 36, true), pisteita = v.getInt32(o + 40, true), alku = o + 44 + 4 * osia;
+      for (let k = 0; k < osia; k++){
+        const a = v.getInt32(o + 44 + 4 * k, true), l = k + 1 < osia ? v.getInt32(o + 44 + 4 * (k + 1), true) : pisteita, R = [];
+        for (let i = a; i < l; i++) R.push([Math.round(v.getFloat64(alku + 16 * i, true) * 10) / 10, Math.round(v.getFloat64(alku + 16 * i + 8, true) * 10) / 10]);
+        renkaat.push(R);
+      }
+    }
+    muodot.push(renkaat); o += pituus;
+  }
+  return muodot;
+}
+
+/** WGS84-leveys ja -pituus (astetta) ETRS-TM35FIN-koordinaateiksi (metriä). Kaavat: JHS 197, Gauss-Krüger. */
+function tm35fin(lat, lon){
+  const a = 6378137, f = 1 / 298.257222101, k0 = 0.9996, lon0 = 27 * Math.PI / 180, E0 = 500000;
+  const n = f / (2 - f), A1 = a / (1 + n) * (1 + n * n / 4 + n ** 4 / 64), e = Math.sqrt(2 * f - f * f);
+  const h = [n / 2 - 2 * n * n / 3 + 5 * n ** 3 / 16 + 41 * n ** 4 / 180, 13 * n * n / 48 - 3 * n ** 3 / 5 + 557 * n ** 4 / 1440, 61 * n ** 3 / 240 - 103 * n ** 4 / 140, 49561 * n ** 4 / 161280];
+  const fi = lat * Math.PI / 180, l = lon * Math.PI / 180 - lon0;
+  const Q = Math.asinh(Math.tan(fi)) - e * Math.atanh(e * Math.sin(fi)), beta = Math.atan(Math.sinh(Q));
+  const eta0 = Math.atanh(Math.cos(beta) * Math.sin(l)), xi0 = Math.asin(Math.sin(beta) * Math.cosh(eta0));
+  let xi = xi0, eta = eta0;
+  h.forEach((hi, i) => { const k = 2 * (i + 1); xi += hi * Math.sin(k * xi0) * Math.cosh(k * eta0); eta += hi * Math.cos(k * xi0) * Math.sinh(k * eta0); });
+  return { E: A1 * eta * k0 + E0, N: A1 * xi * k0 };
+}
+
+/** Onko piste renkaiden sisällä (parillinen–pariton-sääntö, reiät huomioidaan). */
+function sisalla(E, N, renkaat){
+  let s = false;
+  for (const R of renkaat) for (let i = 0, j = R.length - 1; i < R.length; j = i++){
+    const [xi, yi] = R[i], [xj, yj] = R[j];
+    if ((yi > N) !== (yj > N) && E < (xj - xi) * (N - yi) / (yj - yi) + xi) s = !s;
+  }
+  return s;
+}
+/** Pisteen etäisyys renkaiden reunaan metreinä. */
+function etaisyys(E, N, renkaat){
+  let d = Infinity;
+  for (const R of renkaat) for (let i = 0; i + 1 < R.length; i++){
+    const [x1, y1] = R[i], [x2, y2] = R[i + 1], dx = x2 - x1, dy = y2 - y1, L = dx * dx + dy * dy;
+    const t = L ? Math.max(0, Math.min(1, ((E - x1) * dx + (N - y1) * dy) / L)) : 0;
+    d = Math.min(d, Math.hypot(E - x1 - t * dx, N - y1 - t * dy));
+  }
+  return d;
+}
+/** Millä lohkolla piste on. Palauttaa { lohko, sisalla, matka } tai null, jos lohkoja ei ole. */
+function lohkoPisteessa(E, N, lohkot){
+  let paras = null;
+  for (const L of lohkot){
+    if (sisalla(E, N, L.renkaat)) return { lohko: L, sisalla: true, matka: 0 };
+    const m = etaisyys(E, N, L.renkaat);
+    if (!paras || m < paras.matka) paras = { lohko: L, sisalla: false, matka: m };
+  }
+  return paras;
+}
+/** Yhdistää Vipun tiedostot lohkolistaksi. tiedostot = { "peruslohko.dbf": ArrayBuffer, ... }. Kasvulohkot ensisijaisia, jos ne on annettu. */
+function kokoaLohkot(tiedostot){
+  const pari = nimi => tiedostot[nimi + ".dbf"] && tiedostot[nimi + ".shp"] ? { rivit: lueDbf(tiedostot[nimi + ".dbf"]), muodot: lueShp(tiedostot[nimi + ".shp"]) } : null;
+  const perus = pari("peruslohko"), kasvu = pari("kasvulohko"), nimet = {};
+  if (perus) perus.rivit.forEach(r => { nimet[r.pltunnus] = r.nimi; });
+  if (kasvu){
+    const maara = {}; kasvu.rivit.forEach(r => { maara[r.pltunnus] = (maara[r.pltunnus] || 0) + 1; });
+    return kasvu.rivit.map((r, i) => ({ nimi: (nimet[r.pltunnus] || r.pltunnus) + (maara[r.pltunnus] > 1 ? " " + r.kltunnus : ""), ala: r.ala, kasvi: r.kasvi || "", renkaat: kasvu.muodot[i] || [] }));
+  }
+  if (perus) return perus.rivit.map((r, i) => ({ nimi: r.nimi || r.pltunnus, ala: r.ala, kasvi: "", renkaat: perus.muodot[i] || [] }));
+  return [];
+}
+/* ===== YDINFUNKTIOT LOPPU ===== */
+
+/* ----- Tallennus puhelimeen: tekstit localStorageen, kuvat IndexedDB:hen ----- */
+const $ = id => document.getElementById(id);
+const muisti = {
+  lue(k, oletus){ try { const v = localStorage.getItem("tyokoe_" + k); return v == null ? oletus : JSON.parse(v); } catch (e) { return oletus; } },
+  kirjoita(k, v){ try { localStorage.setItem("tyokoe_" + k, JSON.stringify(v)); return true; } catch (e) { return false; } },
+  poista(k){ try { localStorage.removeItem("tyokoe_" + k); } catch (e) {} }
+};
+function kanta(){
+  return new Promise((ok, virhe) => {
+    let p; try { p = indexedDB.open("tyokoe", 1); } catch (e) { return virhe(e); }
+    p.onupgradeneeded = () => p.result.createObjectStore("kuvat");
+    p.onsuccess = () => ok(p.result); p.onerror = () => virhe(p.error);
+  });
+}
+async function kuvaTalteen(id, tiedosto){ const k = await kanta(); return new Promise((ok, virhe) => { const t = k.transaction("kuvat", "readwrite"); t.objectStore("kuvat").put(tiedosto, id); t.oncomplete = ok; t.onerror = () => virhe(t.error); }); }
+async function kuvaHae(id){ const k = await kanta(); return new Promise(ok => { const p = k.transaction("kuvat").objectStore("kuvat").get(id); p.onsuccess = () => ok(p.result || null); p.onerror = () => ok(null); }); }
+async function kuvatPois(){ try { const k = await kanta(); k.transaction("kuvat", "readwrite").objectStore("kuvat").clear(); } catch (e) {} }
+
+const T = { verkoton: "", sailyvyys: "", lohkot: "", sijainti: [], lahetys: "" };   // kokeiden tulokset koosteeseen
+const tila = (id, teksti, luokka) => { const e = $(id); e.textContent = teksti; e.className = "tila" + (luokka ? " " + luokka : ""); };
+const pv = iso => { const d = new Date(iso); return d.getDate() + "." + (d.getMonth() + 1) + "." + d.getFullYear() + " klo " + d.getHours() + "." + String(d.getMinutes()).padStart(2, "0"); };
+
+/* ----- 1. Verkoton käyttö ----- */
+async function koe1(){
+  if (!("serviceWorker" in navigator)){ tila("t1", "ei tuettu", "vi"); T.verkoton = "selain ei tue"; $("s1").textContent = "Tämä selain ei tue verkotonta käyttöä."; return koonti(); }
+  try {
+    await navigator.serviceWorker.register("sw.js");
+    await navigator.serviceWorker.ready;
+    const ohjaa = !!navigator.serviceWorker.controller;
+    tila("t1", ohjaa ? "Valmis" : "Lataa sivu kerran uudelleen", ohjaa ? "ok" : "va");
+    T.verkoton = (ohjaa ? "valmis" : "rekisteröity, ei vielä ohjaa") + ", verkko nyt " + (navigator.onLine ? "päällä" : "POIS");
+    $("s1").textContent = navigator.onLine ? "Verkko on nyt päällä." : "Verkko on nyt pois päältä, ja sivu aukesi silti.";
+    if (!navigator.onLine) tila("t1", "Toimii ilman verkkoa", "ok");
+  } catch (e) { tila("t1", "ei onnistunut", "vi"); T.verkoton = "virhe: " + e.message; $("s1").textContent = "Verkoton käyttö ei käynnistynyt: " + e.message; }
+  koonti();
+}
+
+/* ----- 2. Säilyvyys ----- */
+async function koe2(){
+  const nyt = new Date().toISOString(), eka = muisti.lue("eka", null), kerrat = muisti.lue("kerrat", 0) + 1;
+  const ok = muisti.kirjoita("kerrat", kerrat); if (!eka) muisti.kirjoita("eka", nyt);
+  let pysyva = "ei tietoa";
+  try { if (navigator.storage && navigator.storage.persist) pysyva = (await navigator.storage.persist()) ? "kyllä" : "ei luvattu"; } catch (e) {}
+  if (!ok){ tila("t2", "ei onnistunut", "vi"); T.sailyvyys = "tallennus ei onnistu (yksityinen selaus?)"; $("s2").textContent = "Selain ei anna tallentaa. Tarkista, ettei yksityinen selaus ole päällä."; return koonti(); }
+  const tyot = muisti.lue("tyot", []);
+  tila("t2", kerrat > 1 ? "Säilynyt " + kerrat + " avauskertaa" : "Ensimmäinen avaus", kerrat > 1 ? "ok" : "");
+  $("s2").textContent = "Sivu avattu ensimmäisen kerran " + pv(eka || nyt) + ". Avauskertoja " + kerrat + ", tallennettuja töitä " + tyot.length + ". Pysyvä tallennus: " + pysyva + ".";
+  T.sailyvyys = "avauksia " + kerrat + ", ensimmäinen " + (eka || nyt) + ", töitä " + tyot.length + ", pysyvä: " + pysyva;
+  koonti();
+}
+
+/* ----- 3. Lohkot ----- */
+function naytaLohkot(){
+  const L = muisti.lue("lohkot", []), s = $("lohko");
+  $("lohkolista").innerHTML = ""; L.forEach(l => { const li = document.createElement("li"); li.textContent = l.nimi + ", " + l.ala + " ha" + (l.kasvi ? ", " + l.kasvi : ""); $("lohkolista").appendChild(li); });
+  s.innerHTML = ""; (L.length ? L.map(l => l.nimi) : ["(lue lohkot kohdassa 3)"]).forEach(n => { const o = document.createElement("option"); o.textContent = n; s.appendChild(o); });
+  $("lohkotpois").hidden = !L.length;
+  if (L.length){ tila("t3", L.length + " lohkoa", "ok"); T.lohkot = L.length + " lohkoa, rajat " + L.filter(l => l.renkaat.length).length + " lohkolla"; }
+  else { tila("t3", "ei luettu"); T.lohkot = T.lohkot || "ei luettu"; }
+  koonti();
+}
+$("lohkotied").addEventListener("change", async ev => {
+  const tied = {};
+  try {
+    for (const f of ev.target.files){
+      const m = /(peruslohko|kasvulohko)\.(dbf|shp)$/i.exec(f.name); if (!m) continue;
+      tied[m[1].toLowerCase() + "." + m[2].toLowerCase()] = await f.arrayBuffer();
+    }
+    const L = kokoaLohkot(tied);
+    if (!L.length){ $("s3").textContent = "Lohkoja ei löytynyt. Valitse samalla kertaa sekä .dbf että .shp, joiden nimi päättyy peruslohko tai kasvulohko."; T.lohkot = "valinta ei kelvannut: " + [...ev.target.files].map(f => f.name).join(", "); tila("t3", "ei onnistunut", "va"); return koonti(); }
+    if (!muisti.kirjoita("lohkot", L)){ $("s3").textContent = "Lohkot luettiin, mutta niitä ei voitu tallentaa puhelimeen."; T.lohkot = "luku ok, tallennus ei"; return koonti(); }
+    $("s3").textContent = "Luettu " + L.length + " lohkoa. Ne jäävät vain tähän puhelimeen.";
+    naytaLohkot();
+  } catch (e) { $("s3").textContent = "Tiedoston luku ei onnistunut: " + e.message; T.lohkot = "virhe: " + e.message; tila("t3", "ei onnistunut", "vi"); koonti(); }
+});
+$("lohkotpois").addEventListener("click", () => { muisti.poista("lohkot"); T.lohkot = "poistettu"; $("s3").textContent = "Lohkot poistettu puhelimesta."; naytaLohkot(); });
+
+/* ----- 4. Sijainti ----- */
+$("haesij").addEventListener("click", () => {
+  if (!navigator.geolocation){ tila("t4", "ei tuettu", "vi"); T.sijainti.push("selain ei tue"); $("s4").textContent = "Tämä selain ei anna sijaintia."; return koonti(); }
+  tila("t4", "haetaan…"); const alku = Date.now();
+  navigator.geolocation.getCurrentPosition(p => {
+    const c = p.coords, t = tm35fin(c.latitude, c.longitude), L = muisti.lue("lohkot", []), os = lohkoPisteessa(t.E, t.N, L.filter(l => l.renkaat.length));
+    const lohko = !os ? "lohkoja ei ole luettu" : os.sisalla ? "olet lohkolla " + os.lohko.nimi : "lähin lohko " + os.lohko.nimi + ", " + Math.round(os.matka) + " m";
+    tila("t4", "tarkkuus " + Math.round(c.accuracy) + " m", c.accuracy <= 15 ? "ok" : "va");
+    $("s4").textContent = "Tulos: " + lohko + ". Tarkkuus " + Math.round(c.accuracy) + " m, haku kesti " + ((Date.now() - alku) / 1000).toFixed(1) + " s.";
+    T.sijainti.push(new Date().toISOString().slice(11, 19) + " tarkkuus " + Math.round(c.accuracy) + " m, " + ((Date.now() - alku) / 1000).toFixed(1) + " s, " + lohko);
+    koonti();
+  }, e => {
+    const syy = e.code === 1 ? "Sijaintilupaa ei annettu. Salli sijainti selaimen asetuksista." : e.code === 3 ? "Sijaintia ei saatu ajoissa. Kokeile ulkona." : "Sijaintia ei saatu.";
+    tila("t4", "ei onnistunut", "vi"); $("s4").textContent = syy; T.sijainti.push("virhe " + e.code + ": " + e.message); koonti();
+  }, { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 });
+});
+
+/* ----- 5. Työn kirjaus ----- */
+const TYOT = ["Niitto", "Lannoitus", "Kylvö", "Paalaus", "Muu"]; let valittuTyo = TYOT[0];
+function piirraTyot(){ $("tyot").innerHTML = ""; TYOT.forEach(t => { const b = document.createElement("button"); b.type = "button"; b.className = "siru"; b.textContent = t; b.setAttribute("aria-pressed", String(t === valittuTyo)); b.onclick = () => { valittuTyo = t; piirraTyot(); }; $("tyot").appendChild(b); }); }
+$("tallenna").addEventListener("click", async () => {
+  const id = "t" + Date.now(), kuva = $("kuva").files[0] || null, tyot = muisti.lue("tyot", []);
+  const tyo = { id, tyo: valittuTyo, lohko: $("lohko").value, pvm: $("pvm").value, maara: $("maara").value.trim(), kuva: kuva ? (kuva.name || "kuva.jpg") : "", kuvaKoko: kuva ? kuva.size : 0, kirjattu: new Date().toISOString() };
+  let kuvaOk = true;
+  if (kuva){ try { await kuvaTalteen(id, kuva); } catch (e) { kuvaOk = false; tyo.kuvaVirhe = String(e && e.message || e); } }
+  tyot.push(tyo);
+  if (!muisti.kirjoita("tyot", tyot)){ $("s5").textContent = "Työtä ei voitu tallentaa puhelimeen."; return; }
+  $("s5").textContent = "Tallennettu: " + tyo.tyo + ", " + tyo.lohko + (kuva ? (kuvaOk ? ", kuva tallessa" : ", kuvaa ei saatu talteen") : "") + ".";
+  $("maara").value = ""; $("kuva").value = ""; naytaTyot(); koe2();
+});
+
+/* ----- 6. Lähetys ----- */
+function naytaTyot(){
+  const tyot = muisti.lue("tyot", []), ul = $("tyolista"); ul.innerHTML = "";
+  if (!tyot.length){ const li = document.createElement("li"); li.textContent = "Ei tallennettuja töitä."; ul.appendChild(li); }
+  tyot.forEach(t => { const li = document.createElement("li"); li.textContent = (t.pvm || "") + " " + t.tyo + ", " + t.lohko + (t.maara ? ", " + t.maara : "") + (t.kuva ? ", kuva" : "") + " (kirjattu " + pv(t.kirjattu) + ")"; ul.appendChild(li); });
+  $("laheta").textContent = tyot.length ? "Lähetä " + tyot.length + " työtä tietokoneelle" : "Lähetä työt tietokoneelle";
+}
+$("laheta").addEventListener("click", async () => {
+  const tyot = muisti.lue("tyot", []);
+  if (!tyot.length){ $("s6").textContent = "Tallenna ensin työ kohdassa 5."; return; }
+  const leima = new Date().toISOString().slice(0, 16).replace(/[-:T]/g, "");
+  const tied = [new File([JSON.stringify({ ohjelma: "tyokoe", versio: "0.1", lahetetty: new Date().toISOString(), tyot }, null, 1)], "tyot_" + leima + ".json", { type: "application/json" })];
+  let kuvia = 0;
+  for (const t of tyot){ if (!t.kuva) continue; const b = await kuvaHae(t.id); if (b){ tied.push(new File([b], "tyo_" + t.id + "_" + t.kuva, { type: b.type || "image/jpeg" })); kuvia++; } }
+  const yrita = async (F, tapa) => { await navigator.share({ files: F, title: "Työt" }); tila("t6", "Jakovalikko toimi", "ok"); T.lahetys = tapa + ", töitä " + tyot.length + ", kuvia " + (F.length - 1) + "/" + tyot.filter(t => t.kuva).length; $("s6").textContent = "Jakovalikko avautui. Tarkista tietokoneelta, että tiedostot tulivat kansioon."; };
+  try {
+    if (navigator.canShare && navigator.canShare({ files: tied })) await yrita(tied, "jako: json + kuvat");
+    else if (navigator.canShare && navigator.canShare({ files: [tied[0]] })) await yrita([tied[0]], "jako: vain json (kuvia ei voinut jakaa)");
+    else {
+      const a = document.createElement("a"); a.href = URL.createObjectURL(tied[0]); a.download = tied[0].name; document.body.appendChild(a); a.click(); a.remove();
+      tila("t6", "Lataus, ei jakovalikkoa", "va"); T.lahetys = "selain ei tue tiedostojen jakoa, käytettiin latausta"; $("s6").textContent = "Selain ei tue tiedostojen jakoa. Tiedosto ladattiin puhelimen latauksiin.";
+    }
+  } catch (e) {
+    if (e && e.name === "AbortError"){ T.lahetys = "jakovalikko avautui, käyttäjä perui"; $("s6").textContent = "Lähetys peruttu."; }
+    else { tila("t6", "ei onnistunut", "vi"); T.lahetys = "virhe: " + (e && e.name) + " " + (e && e.message); $("s6").textContent = "Lähetys ei onnistunut: " + (e && e.message); }
+  }
+  koonti();
+});
+$("tyhjenna").addEventListener("click", async () => { muisti.poista("tyot"); await kuvatPois(); $("s6").textContent = "Työt poistettu puhelimesta."; naytaTyot(); koe2(); });
+
+/* ----- 7. Kooste ----- */
+function koonti(){
+  $("tulos").value = ["TYÖKOE 0.1 " + new Date().toISOString(), "Laite: " + navigator.userAgent, "Näyttötila: " + (matchMedia("(display-mode: standalone)").matches || navigator.standalone ? "Koti-valikosta avattu" : "selaimessa"),
+    "1 Verkoton: " + (T.verkoton || "-"), "2 Säilyvyys: " + (T.sailyvyys || "-"), "3 Lohkot: " + (T.lohkot || "-"),
+    "4 Sijainti: " + (T.sijainti.length ? "\n   " + T.sijainti.join("\n   ") : "-"), "6 Lähetys: " + (T.lahetys || "-")].join("\n");
+}
+$("kopioi").addEventListener("click", async () => { try { await navigator.clipboard.writeText($("tulos").value); $("kopioi").textContent = "Kopioitu"; } catch (e) { $("tulos").focus(); $("tulos").select(); $("kopioi").textContent = "Valitse teksti ja kopioi"; } });
+
+/* ----- Käynnistys ----- */
+if (typeof document !== "undefined" && $("pvm")){
+  $("pvm").value = new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+  piirraTyot(); naytaLohkot(); naytaTyot(); koe1(); koe2();
+}
+</script>
+</body>
+</html>
